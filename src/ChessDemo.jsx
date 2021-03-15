@@ -6,8 +6,8 @@ import text from "../pgn/game.js";
 import squareStyleDefault from "../src/SquareStyleDefault"
 import {AbsoluteFill, Img} from 'remotion';
 import styled from 'styled-components';
-
-
+import {useEffect, useState} from 'react';
+import {continueRender, delayRender} from 'remotion';
 
 class ChessGameComponent extends Component {
 	state = {fen: 'start', moveIndex: 0, duration: 8000, squareStyle: squareStyleDefault, whitePlayerName: "Default", blackPlayerName: "Default"};
@@ -22,8 +22,9 @@ class ChessGameComponent extends Component {
 		console.log(this.gameObj.SquareStylesArray.length)
 		console.log(this.gameObj.SquareStylesArray[this.gameObj.SquareStylesArray.length-1])
 		console.log(this.gameObj.FENArray.length)
+		console.log(this.gameObj.CastleMoveNumbers)
 
-		setTimeout(() => this.makeNextMove(), 10000);
+		setTimeout(() => this.makeNextMove(), 20000);
 	}
 
 	componentWillUnmount() {
@@ -45,15 +46,26 @@ class ChessGameComponent extends Component {
 		console.log(currentFEN);
 		console.log(currentStyle);
 
-		if ( true )//this.gameObj.CastleMoveNumbers.includes(index))
+		if (this.gameObj.CastleMoveNumbers.includes(index-1))
 		{
 			this.setState({moveIndex: index+1});
-			setTimeout(() => this.handleCastle(currentFEN, currentStyle), 9000);
-			if (index < this.gameObj.FENArray.length)
-				this.timer();
+			setTimeout(() => this.handleCastle(currentFEN, currentStyle), 12000);
+			
+		}
+		else if (index == this.gameObj.FENArray.length - 1)
+		{
+			this.setState({fen: currentFEN, moveIndex: index+1});
+			setTimeout(() => this.updateSquareStyle(currentStyle), 5000);
 		}
 		else
 		{
+			this.setState({fen: currentFEN, moveIndex: index+1});
+			setTimeout(() => this.updateSquareStyle(currentStyle), 15500);
+		}
+
+		if (index < this.gameObj.FENArray.length - 1)
+		{
+			this.timer();
 		}
 	};
 
@@ -66,7 +78,7 @@ class ChessGameComponent extends Component {
 	}
 
 	render() {
-		const {fen, moveIndex, duration, squareStyle, whitePlayerName, blackPlayerName} = this.state;
+		const {fen, duration, squareStyle, whitePlayerName, blackPlayerName} = this.state;
 		return this.props.children({position: fen, duration: duration, squareStyle: squareStyle, whitePlayerName: whitePlayerName, blackPlayerName: blackPlayerName});
 	}
 }
